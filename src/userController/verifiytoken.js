@@ -11,7 +11,6 @@ try {
     next()
 } catch (error) {
     // console.log("token verified falied!!",error)
-    // console.log(error);
     next()
 }
 
