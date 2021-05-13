@@ -21,10 +21,9 @@ const PostType=new GraphQLObjectType({
     name:"Post",
     description:"POST TYPE",
     fields:()=>({
-        id:{type:GraphQLID},
-        authorName:{type:GraphQLString},
-        title:{type:GraphQLString},
-        year:{type:GraphQLInt},
+        id: { type: GraphQLID },
+        title: { type: GraphQLString },
+        body: { type: GraphQLString },
         author:{
             type:UserType,
             resolve(parent,args){

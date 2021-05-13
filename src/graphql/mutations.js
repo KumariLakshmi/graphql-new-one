@@ -1,13 +1,14 @@
-const { }=require('./types');
+const {PostType,CommentType}=require('./types');
 
 // const {user}=require('../models');
 const user=require('../models/user');
 const userpost=require('../models/userPost');
 const userComments=require('../models/userComments')
 
-const { GraphQLString, GraphQLInt, GraphQLList }=require("graphql");
+const { GraphQLString, GraphQLInt, GraphQLList, GraphQLID }=require("graphql");
 
 const {createToken}=require('../auth/auth');
+
 
 const userRegister={
     type:GraphQLString,
@@ -48,7 +49,7 @@ const userlogin ={
         // if(!user || args.password !== user.password){
         //     return new Error ("invalid password or email")
         // }
-        if(!user==args.password){
+        if(user==args.password){
             console.log("valid password");
         }
         // else{
@@ -60,4 +61,50 @@ const userlogin ={
     }
 }
 
-module.exports={userRegister,userlogin}
+const addPost = {
+    type: PostType,
+    description: "new post",
+    args: {
+        title: { type: GraphQLString },
+        authorName:{type:GraphQLString},
+        year:{type:GraphQLInt}
+    },
+    resolve(parent, args, { verifiedUser }) {
+      console.log("Verified User: ", verifiedUser)
+      if (!verifiedUser) {
+        throw new Error("invalid token")
+      }
+  
+      const post = new userpost({
+        authorId: verifiedUser._id,
+        authorName:args.authorName,
+        title: args.title,
+        year:args.year
+     
+      })
+      console.log("post",post);
+  
+      return post.save()
+    }
+  }
+
+  const addcomment={
+      type: CommentType,
+      description:'new comments',
+      args:{
+        comment:{type:GraphQLString},
+        postId:{type:GraphQLString},
+      },
+      resolve(parent,args,{verifiedUser}){
+          const comment=new userComments({
+              userId:verifiedUser._id,
+              postId:args.postId,
+              comment:args.comment
+          })
+          console.log("comments",comment);
+          return comment.save()
+      }
+  }
+
+  
+module.exports={userRegister,userlogin,addPost,addcomment}
